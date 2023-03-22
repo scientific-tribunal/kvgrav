@@ -4,9 +4,6 @@
   "version": "0.0.1",
   "description": "KVG Gravitation",
   "main": "lib/index.js",
-  "browser": {
-    "./lib/index.js": "./lib/browser.js"
-  },
   "scripts": {
     "test": "jest",
     "build": "tsc",
@@ -17,11 +14,6 @@
     "docsify": "docsify serve ./docs",
     "typedoc": "typedoc --out ./docs/api ./src --readme docs/README.md",
     "docs": "npm run typedoc && npm run docsify"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run codestyle"
-    }
   },
   "keywords": [
     "gravitation",
