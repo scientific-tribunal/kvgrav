@@ -3,7 +3,7 @@
   "packageManager": "yarn@3.2.2",
   "version": "0.0.1",
   "description": "KVG Gravitation",
-  "main": "lib/index.js",
+  "main": "build/index.js",
   "scripts": {
     "test": "jest",
     "build": "tsc",
