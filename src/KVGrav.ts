@@ -63,7 +63,18 @@ export default class KVGrav {
 
        */
 
-    private fun2(
+    /**
+     * Координата точки перемещения текущего объекта с учётом наличия другого объекта
+     * @param {number} sourceX X координата источника гравитации
+     * @param {number} sourceY Y координата источника гравитации
+     * @param {number} sourceMass масса источника гравитации
+     * @param {number} x X координата текущего объекта
+     * @param {number} y Y координата текущего объекта
+     * @param {number} mass масса текущего объекта
+     * @returns {Coordinate} Координаты
+     * @private
+     */
+    private movePointOfCurrObj(
         sourceX: number,
         sourceY: number,
         sourceMass: number,
@@ -99,6 +110,7 @@ export default class KVGrav {
      * @param {number} x
      * @param {number} y
      * @param {number} distance
+     * @returns {Coordinate} Координаты
      * @private
      */
     private nearestPointExtField(
@@ -175,7 +187,7 @@ export default class KVGrav {
             this.radiusExtGravitation
         );
         // console.info(`CENTER id: ${id}, newX ${extGravitation.x}, newY ${extGravitation.y}`);
-        const coordinates2 = this.fun2(
+        const coordinates2 = this.movePointOfCurrObj(
             extGravitation.x,
             extGravitation.y,
             this.powerExtGravitation,
@@ -190,7 +202,7 @@ export default class KVGrav {
                 // console.info(`Skip ${id}`)
                 return;
             }
-            const coordinates = this.fun2(
+            const coordinates = this.movePointOfCurrObj(
                 source.coordinate.x,
                 source.coordinate.y,
                 source.mass,
