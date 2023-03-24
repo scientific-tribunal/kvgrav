@@ -1,9 +1,16 @@
 {
   "name": "kvgrav",
   "packageManager": "yarn@3.2.2",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "KVG Gravitation",
-  "main": "build/index.js",
+  "main": "build/src/index.js",
+  "files": [
+    "build","docs/README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/scientific-tribunal/kvgrav.git"
+  },
   "scripts": {
     "test": "jest",
     "build": "tsc",
