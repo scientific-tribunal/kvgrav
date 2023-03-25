@@ -10,7 +10,7 @@ export default class KVGrav {
    * Установка координат центра относительно внешнего поля
    * @param value
    */
-  set centerCoordinate(value: Coordinate) {
+  public set centerCoordinate(value: Coordinate) {
     this._centerCoordinate = value;
   }
 
@@ -18,7 +18,7 @@ export default class KVGrav {
    * Активация гравитации Ньютона
    * @param {boolean} value
    */
-  set newton(value: boolean) {
+  public set newton(value: boolean) {
     this._newton = value;
   }
 
@@ -53,15 +53,6 @@ export default class KVGrav {
     // return ((sourceMass + mass ) - mass)/Math.pow(distance, 2)*this.transferStrength;
   }
 
-  /*
-      ā={150-160;100-140}={-10;-40} ---вектор
-  С= 21/sqrt(10²+40²)--- скаляр на который надо умножить вектор чтоб получить колинеарный вектор с модулем 21
-  [C*-10,c*-40] колинеарный вектор
-  Отложить от 2 точки
-  [150+С*(-10),100+С*(-40)] координаты точки 3.
-
-       */
-
   /**
    * Координата точки перемещения текущего объекта с учётом наличия другого объекта
    * @param {number} sourceX X координата источника гравитации
@@ -81,6 +72,10 @@ export default class KVGrav {
     y: number,
     mass: number
   ): Coordinate {
+    // console.info(`movePointOfCurrObj(${sourceX}, ${sourceY}, ${sourceMass}, ${x}, ${y}, ${mass}, `);
+    /*    if (centerX==x && centerY == y) {
+          return {x: x, y: y};
+        }*/
     const vectorX = x - sourceX;
     const vectorY = y - sourceY;
     const distance = Math.sqrt(Math.pow(vectorX, 2) + Math.pow(vectorY, 2));
@@ -98,7 +93,6 @@ export default class KVGrav {
     const offsetY = scalar * vectorY;
     const newX = this._newton ? x - offsetX : x + offsetX;
     const newY = this._newton ? y - offsetY : y + offsetY;
-    // console.info(`newX ${newX}, newY ${newY}`);
     return {x: newX, y: newY};
   }
 
@@ -119,23 +113,24 @@ export default class KVGrav {
     y: number,
     distance: number
   ): Coordinate {
-    const vectorX = x - centerX;
-    const vectorY = y - centerY;
-    const scalar =
-      distance /
-      Math.sqrt(
-        // Math.pow( Math.abs(vectorX), 2) + Math.pow(Math.abs(vectorY), 2)
-        Math.pow(vectorX, 2) + Math.pow(vectorY, 2)
-      );
-    // console.info(`scalar ${scalar}`);
-    // const newX = centerX + scalar * vectorX;
-    // const newY = centerY + scalar * vectorY;
-    const offsetX = scalar * vectorX;
-    const offsetY = scalar * vectorY;
-    const newX = this._newton ? centerX - offsetX : centerX + offsetX;
-    const newY = this._newton ? centerY - offsetY : centerX + offsetY;
-    // console.info(`newX ${newX}, newY ${newY}`);
-    return {x: newX, y: newY};
+    // console.info(`nearestPointExtField(${centerX}, ${centerY}, ${x}, ${y}, ${distance})`);
+    if (centerX == x && centerY == y) {
+      // силы уравновешены
+      return {x: -1, y: -1};
+    } else {
+      const vectorX = x - centerX;
+      const vectorY = y - centerY;
+      const scalar =
+        distance /
+        Math.sqrt(
+          // Math.pow( Math.abs(vectorX), 2) + Math.pow(Math.abs(vectorY), 2)
+          Math.pow(vectorX, 2) + Math.pow(vectorY, 2)
+        );
+      // console.info(`scalar ${scalar}`);
+      const newX = centerX + scalar * vectorX;
+      const newY = centerY + scalar * vectorY;
+      return {x: newX, y: newY};
+    }
   }
 
   private avg(coordinates: Array<Coordinate>): Coordinate {
@@ -153,7 +148,7 @@ export default class KVGrav {
    * Обработка всех обьектов гравитации (кроме внешнего поля)
    * @param {CoordiMass[]} list Массив координат
    */
-  calculates(list: Array<CoordiMass>) {
+  public calculates(list: Array<CoordiMass>) {
     let preCoordinates: Array<Coordinate> = [];
     list.forEach((item, index) => {
       const coordinate = this.calculate(list, item, index);
@@ -177,24 +172,27 @@ export default class KVGrav {
     id: number
   ): Coordinate {
     let preCoordinates: Array<Coordinate> = [];
+// console.log(`calculate(${listCoordiMass.length}, object, ${id} )`, target);
+    if (this._centerCoordinate.x != target.coordinate.x && this._centerCoordinate.y != target.coordinate.y) {
+      const extGravitation = this.nearestPointExtField(
+        this._centerCoordinate.x,
+        this._centerCoordinate.y,
+        target.coordinate.x,
+        target.coordinate.y,
+        this.radiusExtGravitation
+      );
+      // console.info(`CENTER id: ${id}, newX ${extGravitation.x}, newY ${extGravitation.y}`);
 
-    const extGravitation = this.nearestPointExtField(
-      this._centerCoordinate.x,
-      this._centerCoordinate.y,
-      target.coordinate.x,
-      target.coordinate.y,
-      this.radiusExtGravitation
-    );
-    // console.info(`CENTER id: ${id}, newX ${extGravitation.x}, newY ${extGravitation.y}`);
-    const coordinates2 = this.movePointOfCurrObj(
-      extGravitation.x,
-      extGravitation.y,
-      this.powerExtGravitation,
-      target.coordinate.x,
-      target.coordinate.y,
-      target.mass
-    );
-    preCoordinates.push({x: coordinates2.x, y: coordinates2.y});
+      const coordinates2 = this.movePointOfCurrObj(
+        extGravitation.x,
+        extGravitation.y,
+        this.powerExtGravitation,
+        target.coordinate.x,
+        target.coordinate.y,
+        target.mass
+      );
+      preCoordinates.push({x: coordinates2.x, y: coordinates2.y});
+    }
 
     listCoordiMass.forEach((source, index) => {
       if (id == index) {
@@ -210,16 +208,13 @@ export default class KVGrav {
         target.mass
       );
       preCoordinates.push({x: coordinates.x, y: coordinates.y});
-      // const coordinates2 = this.fun3(this.centerCoordinate.x, this.centerCoordinate.y, target.coordinate.x, target.coordinate.y, 300);
-      // console.info(`CENTER id: ${id}, newX ${coordinates2.x}, newY ${coordinates2.y}`);
-      // listCoordiMass[id]= {x: coordinate.x, y: coordinate.y, mass: target.mass};
-      // console.info(`id: ${id}, X ${target.x}, Y ${target.y}`);
-      // console.info(`id: ${id}, newX ${coordinate.x}, newY ${coordinate.y}`);
     });
 
-    // console.info(`id: ${id}`, preCoordinates);
-    const avgCoordinates = this.avg(preCoordinates);
-    // listCoordiMass[id].coordinate= {x: avgCoordinates.x, y: avgCoordinates.y};
-    return {x: avgCoordinates.x, y: avgCoordinates.y};
+    if (preCoordinates.length == 0) {
+      return {x: target.coordinate.x, y: target.coordinate.y};
+    } else {
+      const avgCoordinates = this.avg(preCoordinates);
+      return {x: avgCoordinates.x, y: avgCoordinates.y};
+    }
   }
 }

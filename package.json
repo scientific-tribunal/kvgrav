@@ -1,7 +1,7 @@
 {
   "name": "kvgrav",
   "packageManager": "yarn@3.2.2",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "KVG Gravitation",
   "main": "build/src/index.js",
   "files": [
@@ -31,7 +31,8 @@
   },
   "keywords": [
     "gravitation",
-    "katyushik"
+    "phisics",
+    "simulation"
   ],
   "author": "webcounters (https://github.com/counters)",
   "license": "Apache-2.0",
